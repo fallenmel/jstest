@@ -1,11 +1,28 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Betica Shop</title>
     <meta charset="utf-8">
-    <meta name="author" content="YOUR NAME">
+    <meta name="author" content="Mel Dingal">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <div id="content"></div>
+    <div id="content">
+      <div class="container">
+          <h1>Betica Shop</h1>
+          <div class="container" id='products'></div>
+      </div>
+    </div>
+
+
+    <script
+    src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script type="text/javascript">
       var info = {
         "items": {
@@ -79,7 +96,62 @@
        
       // enter your code here
       // render the items in the info using native Javascript or jQuery
+      
+      //js6 , jquery and bootstrap ^_^ not sure if I need to add babel via webpack for cross browser and for scss
+      //i use js6 for my js script cause it's more english like and usually we don't deploy unbuild/minified js and css
+      //i use jquery for element selector and dom manipulation
+      //bootstrap for grid display
+      //and custom css for simple styling
+      //i use moment js for date parsing
+      $(document).ready( ()=>{
+        //let jq load;
 
+        let {items} = info; //extract items from the info var;
+        //convert item from object to array and keep the key
+        let itemsArr = Object.keys(items).map(key => {
+          return { ...items[key], key};
+        }); 
+
+        //get all unique title no manufacturer
+        let categories = itemsArr.filter(item => item.manufacturer == undefined);
+
+        //fetch product by category
+        categories.forEach( category => {
+          const products = itemsArr.filter(item => item.parent == category.key);
+
+          //append data to the content element
+          //save data to a jsx like format
+          const productsDom = `
+            <div class="container">
+              ${
+                products.map(product =>{
+                  return `
+                  <div class="row col-xs-12 text-center" id="item" >
+                    <h3>${product.title}<h3>
+                    <p>Manufactured by: ${product.manufacturer}</p>
+                    <p>Release Date : ${moment(product.releaseDate).format('MMMM Do YYYY')}</p>
+                    <button class="btn btn-success">${product.price}</button>
+                  </div>`;
+                }).join('')
+              }
+            </div>
+          `;
+          const domData = `
+            <div class="row col-xs-12" id="category">
+              <h2>${category.title}</h2>
+              ${products.length ? productsDom : ''}
+            </div>
+            <hr>
+          `;
+
+          $('#content > div > #products').append(domData);
+        });
+
+        
+      });
+
+     
+      
     </script>
 </body>
 </html>
